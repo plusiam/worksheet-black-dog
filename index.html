@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>생명은 소중해요 - 검은 강아지 학습지</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-cream: #FFF8EE;
+            --bg-lavender: #F9F5FF;
+            --brown-warm: #C7A58A;
+            --brown-dark: #8B6F5C;
+            --brown-light: #E8D5C4;
+            --text-main: #4A3728;
+            --text-soft: #6B5344;
+            --accent-coral: #E8A87C;
+            --accent-soft: #F5E6D3;
+            --border-soft: #D4C4B0;
+            --paw-bg: rgba(199, 165, 138, 0.15);
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f0f0f0;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* 액션 버튼 영역 */
+        .action-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--brown-dark) 0%, #6B5344 100%);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A5A 100%);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: linear-gradient(135deg, #FF5252 0%, #E53935 100%);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #4ECDC4 0%, #44B4AB 100%);
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #3DBDB5 0%, #2E9D95 100%);
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: linear-gradient(135deg, #9061F9 0%, #7C3AED 100%);
+        }
+
+        .btn-icon {
+            font-size: 18px;
+        }
+
+        /* 드롭다운 메뉴 */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            min-width: 160px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            z-index: 1001;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 18px;
+            font-size: 14px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent-soft);
+        }
+
+        .dropdown-item:not(:last-child) {
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        /* 콘텐츠 영역 - 액션바 공간 확보 */
+        .content-wrapper {
+            padding-top: 80px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: var(--bg-cream);
+            margin: 10px auto;
+            padding: 12mm 14mm;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 10% 20%, var(--paw-bg) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, var(--paw-bg) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* 헤더 */
+        .header {
+            background: linear-gradient(135deg, var(--brown-warm) 0%, var(--brown-dark) 100%);
+            border-radius: 16px;
+            padding: 14px 20px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 4px 12px rgba(139, 111, 92, 0.25);
+            position: relative;
+        }
+
+        .dog-icon {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 900;
+            color: white;
+            letter-spacing: -0.5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            margin-top: 2px;
+        }
+
+        .paw-trail {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            opacity: 0.4;
+            letter-spacing: 8px;
+        }
+
+        /* 학생 정보 - 인터랙티브 */
+        .student-info {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+
+        .student-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .student-info-item label {
+            color: var(--text-soft);
+            font-weight: 500;
+        }
+
+        .student-info-item input {
+            width: 60px;
+            height: 28px;
+            border: none;
+            border-bottom: 2px dotted var(--border-soft);
+            background: transparent;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            color: var(--text-main);
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .student-info-item input:focus {
+            border-bottom-color: var(--accent-coral);
+        }
+
+        .student-info-item input.name {
+            width: 100px;
+        }
+
+        /* 섹션 */
+        .section {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 2px solid var(--brown-light);
+            position: relative;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed var(--accent-soft);
+        }
+
+        .section-number {
+            width: 28px;
+            height: 28px;
+            background: var(--brown-warm);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .section-title h2 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--brown-dark);
+        }
+
+        /* 질문 */
+        .question {
+            margin-bottom: 12px;
+        }
+
+        .question:last-child {
+            margin-bottom: 0;
+        }
+
+        .question-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .q-num {
+            background: var(--accent-coral);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* 선택지 - 인터랙티브 */
+        .choice-row {
+            display: flex;
+            gap: 16px;
+            margin-left: 30px;
+            flex-wrap: wrap;
+        }
+
+        .choice-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .choice-item:hover {
+            color: var(--text-main);
+        }
+
+        .choice-item input[type="radio"],
+        .choice-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-soft);
+            border-radius: 4px;
+            background: white;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .choice-item input[type="checkbox"]:checked + .checkbox {
+            background: var(--accent-coral);
+            border-color: var(--accent-coral);
+        }
+
+        .choice-item input[type="checkbox"]:checked + .checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .circle-choice {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-soft);
+            border-radius: 50%;
+            background: white;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .choice-item input[type="radio"]:checked + .circle-choice {
+            border-color: var(--accent-coral);
+        }
+
+        .choice-item input[type="radio"]:checked + .circle-choice::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--accent-coral);
+            border-radius: 50%;
+        }
+
+        .etc-input {
+            width: 100px;
+            border: none;
+            border-bottom: 1.5px dotted var(--border-soft);
+            background: transparent;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            margin-left: 4px;
+        }
+
+        .etc-input:focus {
+            border-bottom-color: var(--accent-coral);
+        }
+
+        /* 그림 공간 */
+        .drawing-area {
+            border: 2px dashed var(--brown-light);
+            border-radius: 12px;
+            padding: 10px;
+            margin-left: 30px;
+            background: linear-gradient(135deg, #FFFDF9 0%, #FFF9F0 100%);
+        }
+
+        .drawing-box {
+            display: flex;
+            gap: 12px;
+        }
+
+        .drawing-space {
+            flex: 1;
+            min-height: 70px;
+            border: 1.5px solid var(--border-soft);
+            border-radius: 8px;
+            background: white;
+            position: relative;
+        }
+
+        .drawing-space::before {
+            content: '🖍';
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .drawing-canvas {
+            width: 100%;
+            height: 100%;
+            min-height: 160px;
+            border-radius: 8px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .drawing-label {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-soft);
+            opacity: 0.7;
+        }
+
+        .writing-space {
+            flex: 1;
+            min-height: 70px;
+            border: 1.5px solid var(--border-soft);
+            border-radius: 8px;
+            background: white;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 10px 6px;
+        }
+
+        .writing-space::before {
+            content: '✏';
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .write-line {
+            flex: 1;
+            border-bottom: 1.5px dotted var(--border-soft);
+            margin-bottom: 6px;
+        }
+
+        .write-line:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 한 줄 쓰기 - 인터랙티브 */
+        .single-write {
+            margin-left: 30px;
+            padding: 10px 12px;
+            background: white;
+            border: 1.5px solid var(--border-soft);
+            border-radius: 8px;
+            min-height: 36px;
+        }
+
+        .single-write textarea {
+            width: 100%;
+            min-height: 26px;
+            border: none;
+            border-bottom: 1.5px dotted var(--border-soft);
+            background: transparent;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            color: var(--text-main);
+            resize: none;
+            outline: none;
+            line-height: 1.6;
+        }
+
+        .single-write textarea:focus {
+            border-bottom-color: var(--accent-coral);
+        }
+
+        /* 번호 매기기 쓰기 - 인터랙티브 */
+        .numbered-write {
+            margin-left: 30px;
+        }
+
+        .numbered-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .numbered-item span {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--brown-warm);
+        }
+
+        .numbered-item input {
+            flex: 1;
+            border: none;
+            border-bottom: 1.5px dotted var(--border-soft);
+            background: transparent;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            color: var(--text-main);
+            min-height: 22px;
+            outline: none;
+        }
+
+        .numbered-item input:focus {
+            border-bottom-color: var(--accent-coral);
+        }
+
+        /* 강조 박스 */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--accent-soft) 0%, #FFF5EB 100%);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-left: 30px;
+            font-size: 12.5px;
+            color: var(--text-soft);
+            border-left: 4px solid var(--accent-coral);
+        }
+
+        /* 별 약속 박스 - 인터랙티브 */
+        .promise-box {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF5D6 100%);
+            border: 2px solid #F5D98A;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-left: 30px;
+            position: relative;
+        }
+
+        .promise-box::before {
+            content: '⭐';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
+        .promise-box input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid #E8C864;
+            background: transparent;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+            min-height: 26px;
+            outline: none;
+        }
+
+        .promise-box input:focus {
+            border-bottom-color: var(--accent-coral);
+        }
+
+        /* 페이지 번호 */
+        .page-number {
+            position: absolute;
+            bottom: 10mm;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-soft);
+            opacity: 0.6;
+        }
+
+        /* 뒷면 배경 살짝 다르게 */
+        .page.back {
+            background: var(--bg-lavender);
+        }
+
+        .page.back::before {
+            background-image:
+                radial-gradient(circle at 85% 15%, rgba(199, 165, 138, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 15% 85%, rgba(199, 165, 138, 0.12) 0%, transparent 50%);
+        }
+
+        /* 감정 선택 그리드 - 인터랙티브 */
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-left: 30px;
+        }
+
+        .emotion-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-soft);
+            padding: 6px 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-soft);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emotion-item:hover {
+            border-color: var(--accent-coral);
+        }
+
+        .emotion-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .emotion-item input[type="checkbox"]:checked ~ span {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .emotion-item:has(input:checked) {
+            border-color: var(--accent-coral);
+            background: #FFF5EB;
+        }
+
+        .emotion-item:has(input:checked) .checkbox {
+            background: var(--accent-coral);
+            border-color: var(--accent-coral);
+        }
+
+        .emotion-item:has(input:checked) .checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* 비교 선택 - 인터랙티브 */
+        .compare-options {
+            display: flex;
+            gap: 12px;
+            margin-left: 30px;
+            flex-wrap: wrap;
+        }
+
+        .compare-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-soft);
+            padding: 8px 14px;
+            background: white;
+            border-radius: 20px;
+            border: 2px solid var(--border-soft);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .compare-item:hover {
+            border-color: var(--accent-coral);
+        }
+
+        .compare-item input[type="radio"] {
+            display: none;
+        }
+
+        .compare-item:has(input:checked) {
+            border-color: var(--accent-coral);
+            background: var(--accent-coral);
+            color: white;
+        }
+
+        .compare-item:has(input:checked) .checkbox {
+            background: white;
+            border-color: white;
+        }
+
+        .compare-item:has(input:checked) .checkbox::after {
+            content: '✓';
+            color: var(--accent-coral);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* 로딩 오버레이 */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px 50px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-soft);
+            border-top-color: var(--accent-coral);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 인쇄 설정 */
+        @media print {
+            body {
+                background: white;
+            }
+            .action-bar {
+                display: none !important;
+            }
+            .content-wrapper {
+                padding-top: 0;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+            .page:last-child {
+                page-break-after: auto;
+            }
+            .loading-overlay {
+                display: none !important;
+            }
+            /* 입력 필드를 인쇄 시 보이게 */
+            input, textarea {
+                border-color: var(--border-soft) !important;
+            }
+        }
+
+        /* 반응형 */
+        @media (max-width: 800px) {
+            .action-bar {
+                padding: 10px 15px;
+                gap: 8px;
+            }
+            .action-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+            .btn-icon {
+                font-size: 16px;
+            }
+            .content-wrapper {
+                padding-top: 120px;
+            }
+            .page {
+                width: 100%;
+                height: auto;
+                min-height: auto;
+                padding: 15px;
+                margin: 5px auto;
+            }
+        }
+
+        /* 푸터 장식 */
+        .footer-deco {
+            position: absolute;
+            bottom: 18mm;
+            right: 14mm;
+            font-size: 24px;
+            opacity: 0.2;
+        }
+
+        /* 확인 모달 */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-modal.active {
+            display: flex;
+        }
+
+        .confirm-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .confirm-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .confirm-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            color: var(--text-soft);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .confirm-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .confirm-btn.cancel {
+            background: var(--border-soft);
+            color: var(--text-soft);
+        }
+
+        .confirm-btn.cancel:hover {
+            background: #C4B4A0;
+        }
+
+        .confirm-btn.confirm {
+            background: var(--accent-coral);
+            color: white;
+        }
+
+        .confirm-btn.confirm:hover {
+            background: #D9956C;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 액션 버튼 바 -->
+<div class="action-bar">
+    <button class="action-btn btn-reset" onclick="confirmReset()">
+        <span class="btn-icon">🔄</span>
+        <span>다시 작성하기</span>
+    </button>
+
+    <div class="dropdown">
+        <button class="action-btn btn-download">
+            <span class="btn-icon">📥</span>
+            <span>다운로드</span>
+            <span style="font-size: 10px;">▼</span>
+        </button>
+        <div class="dropdown-content">
+            <button class="dropdown-item" onclick="downloadAsImage()">
+                <span>🖼️</span>
+                <span>이미지로 저장 (PNG)</span>
+            </button>
+            <button class="dropdown-item" onclick="downloadAsPDF()">
+                <span>📄</span>
+                <span>PDF로 저장</span>
+            </button>
+        </div>
+    </div>
+
+    <button class="action-btn btn-print" onclick="printWorksheet()">
+        <span class="btn-icon">🖨️</span>
+        <span>인쇄하기</span>
+    </button>
+</div>
+
+<!-- 로딩 오버레이 -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">처리 중...</div>
+    </div>
+</div>
+
+<!-- 확인 모달 -->
+<div class="confirm-modal" id="confirmModal">
+    <div class="confirm-content">
+        <div class="confirm-icon">🔄</div>
+        <div class="confirm-title">다시 작성하시겠습니까?</div>
+        <div class="confirm-message">입력한 모든 내용이 지워집니다.<br>정말 초기화하시겠습니까?</div>
+        <div class="confirm-buttons">
+            <button class="confirm-btn cancel" onclick="closeConfirmModal()">취소</button>
+            <button class="confirm-btn confirm" onclick="resetForm()">초기화</button>
+        </div>
+    </div>
+</div>
+
+<!-- 콘텐츠 영역 -->
+<div class="content-wrapper" id="worksheetContent">
+
+<!-- 앞면 -->
+<div class="page front" id="page1">
+    <header class="header">
+        <div class="dog-icon">🐕‍🦺</div>
+        <div class="header-text">
+            <h1>생명은 소중해요</h1>
+            <div class="subtitle">그림책 '검은 강아지'를 읽고 생각해요 🐾</div>
+        </div>
+        <div class="paw-trail">🐾🐾🐾</div>
+    </header>
+
+    <div class="student-info">
+        <div class="student-info-item">
+            <label>학년</label>
+            <input type="text" name="grade" placeholder="">
+        </div>
+        <div class="student-info-item">
+            <label>반</label>
+            <input type="text" name="class" placeholder="">
+        </div>
+        <div class="student-info-item">
+            <label>번호</label>
+            <input type="text" name="number" placeholder="">
+        </div>
+        <div class="student-info-item">
+            <label>이름</label>
+            <input type="text" name="name" class="name" placeholder="">
+        </div>
+    </div>
+
+    <!-- 섹션 1 -->
+    <section class="section">
+        <div class="section-title">
+            <div class="section-number">1</div>
+            <h2>나의 마음 들여다보기</h2>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">①</span>
+                <span>나는 강아지를 키워보고 싶었던 적이</span>
+            </div>
+            <div class="choice-row">
+                <label class="choice-item">
+                    <input type="radio" name="q1" value="있다">
+                    <div class="circle-choice"></div>
+                    <span>있다</span>
+                </label>
+                <label class="choice-item">
+                    <input type="radio" name="q1" value="없다">
+                    <div class="circle-choice"></div>
+                    <span>없다</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">②</span>
+                <span>왜 그런 마음이 들었나요?</span>
+            </div>
+            <div class="choice-row">
+                <label class="choice-item">
+                    <input type="checkbox" name="q2" value="귀여워서">
+                    <div class="checkbox"></div>
+                    <span>귀여워서</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q2" value="친구처럼 느껴져서">
+                    <div class="checkbox"></div>
+                    <span>친구처럼 느껴져서</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q2" value="외로워서">
+                    <div class="checkbox"></div>
+                    <span>외로워서</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q2" value="남들도 키워서">
+                    <div class="checkbox"></div>
+                    <span>남들도 키워서</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q2" value="기타">
+                    <div class="checkbox"></div>
+                    <span>기타:</span>
+                    <input type="text" class="etc-input" name="q2_etc" placeholder="">
+                </label>
+            </div>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">③</span>
+                <span>강아지를 키우면 좋을 것 같은 이유를 적어 보세요.</span>
+            </div>
+            <div class="single-write">
+                <textarea name="q3" rows="1" placeholder="생각을 자유롭게 적어보세요..."></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 2 -->
+    <section class="section">
+        <div class="section-title">
+            <div class="section-number">2</div>
+            <h2>강아지는 어떤 존재일까?</h2>
+        </div>
+
+        <div class="highlight-box" style="margin-left: 0; margin-bottom: 12px;">
+            강아지는 스스로 지킬 수 없는 것들이 있어요. 사람의 돌봄이 필요한 이유를 생각해 보아요.
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">④</span>
+                <span>강아지가 스스로 할 수 없는 것을 3개 골라보세요.</span>
+            </div>
+            <div class="choice-row">
+                <label class="choice-item">
+                    <input type="checkbox" name="q4" value="밥 챙겨 먹기">
+                    <div class="checkbox"></div>
+                    <span>밥 챙겨 먹기</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q4" value="아플 때 병원 가기">
+                    <div class="checkbox"></div>
+                    <span>아플 때 병원 가기</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q4" value="산책하기">
+                    <div class="checkbox"></div>
+                    <span>산책하기</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q4" value="외로운 마음 말하기">
+                    <div class="checkbox"></div>
+                    <span>외로운 마음 말하기</span>
+                </label>
+                <label class="choice-item">
+                    <input type="checkbox" name="q4" value="집 청소하기">
+                    <div class="checkbox"></div>
+                    <span>집 청소하기</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑤</span>
+                <span>강아지가 '사람의 도움'을 꼭 필요로 하는 이유를 한 문장으로 적어 보세요.</span>
+            </div>
+            <div class="single-write">
+                <textarea name="q5" rows="1" placeholder="한 문장으로 정리해보세요..."></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 3 -->
+    <section class="section">
+        <div class="section-title">
+            <div class="section-number">3</div>
+            <h2>유기된 강아지의 마음 상상하기</h2>
+        </div>
+
+        <div class="highlight-box" style="margin-left: 0; margin-bottom: 12px;">
+            영상·그림 속 강아지는 어떤 기분이었을까요?
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑥</span>
+                <span>느꼈을 것 같은 감정을 3개 골라보세요.</span>
+            </div>
+            <div class="emotion-grid">
+                <label class="emotion-item">
+                    <input type="checkbox" name="q6" value="슬픔">
+                    <div class="checkbox"></div>
+                    <span>😢 슬픔</span>
+                </label>
+                <label class="emotion-item">
+                    <input type="checkbox" name="q6" value="무서움">
+                    <div class="checkbox"></div>
+                    <span>😨 무서움</span>
+                </label>
+                <label class="emotion-item">
+                    <input type="checkbox" name="q6" value="외로움">
+                    <div class="checkbox"></div>
+                    <span>😔 외로움</span>
+                </label>
+                <label class="emotion-item">
+                    <input type="checkbox" name="q6" value="배고픔">
+                    <div class="checkbox"></div>
+                    <span>🥺 배고픔</span>
+                </label>
+                <label class="emotion-item">
+                    <input type="checkbox" name="q6" value="아픔">
+                    <div class="checkbox"></div>
+                    <span>🤕 아픔</span>
+                </label>
+                <label class="emotion-item">
+                    <input type="checkbox" name="q6" value="혼란">
+                    <div class="checkbox"></div>
+                    <span>😵 혼란</span>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-deco">🐾</div>
+    <div class="page-number">앞면</div>
+</div>
+
+<!-- 뒷면 -->
+<div class="page back" id="page2">
+    <header class="header">
+        <div class="dog-icon">🐕‍🦺</div>
+        <div class="header-text">
+            <h1>생명은 소중해요</h1>
+            <div class="subtitle">그림책 '검은 강아지'를 읽고 생각해요 🐾</div>
+        </div>
+        <div class="paw-trail">🐾🐾🐾</div>
+    </header>
+
+    <!-- 섹션 3 계속 - 그림 표현 -->
+    <section class="section">
+        <div class="section-title">
+            <div class="section-number">3</div>
+            <h2>유기된 강아지의 마음 상상하기</h2>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑦</span>
+                <span>마음에 남은 장면을 그림으로 표현해 보세요.</span>
+            </div>
+            <div class="drawing-area">
+                <div class="drawing-space" style="min-height: 160px; position: relative;">
+                    <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
+                    <span class="drawing-label">그림으로 표현</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 4 -->
+    <section class="section">
+        <div class="section-title">
+            <div class="section-number">4</div>
+            <h2>나의 마음과 강아지의 필요 연결하기</h2>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑧</span>
+                <span>'내가 키우고 싶었던 이유'와 '강아지가 필요로 하는 돌봄'은 같은가요?</span>
+            </div>
+            <div class="compare-options">
+                <label class="compare-item">
+                    <input type="radio" name="q8" value="거의 같다">
+                    <div class="checkbox"></div>
+                    <span>거의 같다</span>
+                </label>
+                <label class="compare-item">
+                    <input type="radio" name="q8" value="조금 다르다">
+                    <div class="checkbox"></div>
+                    <span>조금 다르다</span>
+                </label>
+                <label class="compare-item">
+                    <input type="radio" name="q8" value="많이 다르다">
+                    <div class="checkbox"></div>
+                    <span>많이 다르다</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑨</span>
+                <span>무엇이 다르게 느껴졌나요?</span>
+            </div>
+            <div class="single-write" style="min-height: 60px;">
+                <textarea name="q9" rows="2" placeholder="다르게 느껴진 점을 적어보세요..."></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- 섹션 5 -->
+    <section class="section">
+        <div class="section-title">
+            <div class="section-number">5</div>
+            <h2>생명을 존중하는 나의 약속</h2>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑩</span>
+                <span>강아지를 키우기 전에 꼭 생각해야 하는 점 2가지</span>
+            </div>
+            <div class="numbered-write">
+                <div class="numbered-item">
+                    <span>1.</span>
+                    <input type="text" name="q10_1" placeholder="첫 번째 생각...">
+                </div>
+                <div class="numbered-item">
+                    <span>2.</span>
+                    <input type="text" name="q10_2" placeholder="두 번째 생각...">
+                </div>
+            </div>
+        </div>
+
+        <div class="question">
+            <div class="question-label">
+                <span class="q-num">⑪</span>
+                <span>생명을 존중하는 나만의 약속 한 문장</span>
+            </div>
+            <div class="promise-box">
+                <input type="text" name="q11" placeholder="나만의 약속을 적어보세요...">
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-deco">🐾</div>
+    <div class="page-number">뒷면</div>
+</div>
+
+</div>
+
+<script>
+    // 그림판 초기화
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    function initCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.offsetWidth - 4;
+        canvas.height = container.offsetHeight - 20;
+        ctx.strokeStyle = '#4A3728';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    // 터치 지원
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        isDrawing = true;
+        lastX = touch.clientX - rect.left;
+        lastY = touch.clientY - rect.top;
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!isDrawing) return;
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        [lastX, lastY] = [x, y];
+    });
+
+    canvas.addEventListener('touchend', () => isDrawing = false);
+
+    // 초기화
+    window.addEventListener('load', initCanvas);
+    window.addEventListener('resize', initCanvas);
+
+    // 확인 모달 표시
+    function confirmReset() {
+        document.getElementById('confirmModal').classList.add('active');
+    }
+
+    // 확인 모달 닫기
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+    }
+
+    // 폼 초기화
+    function resetForm() {
+        closeConfirmModal();
+
+        // 모든 input 초기화
+        document.querySelectorAll('input[type="text"], input[type="radio"], input[type="checkbox"], textarea').forEach(el => {
+            if (el.type === 'radio' || el.type === 'checkbox') {
+                el.checked = false;
+            } else {
+                el.value = '';
+            }
+        });
+
+        // 캔버스 초기화
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 성공 메시지
+        showToast('학습지가 초기화되었습니다.');
+    }
+
+    // 토스트 메시지
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 4000;
+            animation: fadeInOut 2s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    // CSS 애니메이션 추가
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 로딩 표시
+    function showLoading(text) {
+        document.getElementById('loadingText').textContent = text;
+        document.getElementById('loadingOverlay').classList.add('active');
+    }
+
+    function hideLoading() {
+        document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    // 이미지로 다운로드
+    async function downloadAsImage() {
+        showLoading('이미지 생성 중...');
+
+        try {
+            const pages = document.querySelectorAll('.page');
+            const zip = [];
+
+            for (let i = 0; i < pages.length; i++) {
+                const page = pages[i];
+                const canvas = await html2canvas(page, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null
+                });
+
+                const link = document.createElement('a');
+                link.download = `학습지_${i === 0 ? '앞면' : '뒷면'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                await new Promise(r => setTimeout(r, 500));
+            }
+
+            showToast('이미지가 저장되었습니다.');
+        } catch (error) {
+            console.error('이미지 저장 실패:', error);
+            showToast('이미지 저장에 실패했습니다.');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // PDF로 다운로드
+    async function downloadAsPDF() {
+        showLoading('PDF 생성 중...');
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pages = document.querySelectorAll('.page');
+
+            for (let i = 0; i < pages.length; i++) {
+                const page = pages[i];
+
+                const canvas = await html2canvas(page, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+
+                if (i > 0) {
+                    pdf.addPage();
+                }
+
+                pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+            }
+
+            // 학생 이름 가져오기
+            const studentName = document.querySelector('input[name="name"]').value || '학습지';
+            pdf.save(`${studentName}_생명은소중해요.pdf`);
+
+            showToast('PDF가 저장되었습니다.');
+        } catch (error) {
+            console.error('PDF 저장 실패:', error);
+            showToast('PDF 저장에 실패했습니다.');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // 인쇄
+    function printWorksheet() {
+        window.print();
+    }
+
+    // 모달 외부 클릭 시 닫기
+    document.getElementById('confirmModal').addEventListener('click', (e) => {
+        if (e.target.id === 'confirmModal') {
+            closeConfirmModal();
+        }
+    });
+</script>
+
+</body>
+</html>
